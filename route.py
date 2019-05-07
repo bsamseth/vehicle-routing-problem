@@ -12,7 +12,7 @@ class SubRoute(list):
 
         # Compute cost of route and leftover capacity.
         self.cost = 0
-        self.capacity = instance["capacity"]  # Initial capacity. 
+        self.capacity = instance["capacity"]  # Initial capacity.
         last_x, last_y = instance["depot"]  # Start at depot.
         for customer in (instance["customers"][c_id] for c_id in self):
 
@@ -27,7 +27,7 @@ class SubRoute(list):
         self.cost += math.sqrt((x - last_x) ** 2 + (y - last_y) ** 2)
 
         if self.capacity < 0:
-            raise ValueError("The sub route exceeds the capacity of the trucks.")
+            raise ValueError(f"The sub route exceeds the capacity of the trucks. {sub_route}")
 
 
 class Route(list):
@@ -66,13 +66,38 @@ class Route(list):
 
             try:
                 # Convert plain lists to SubRoute, which raises error if routes are impossible.
-                sub_i, sub_j = SubRoute(sub_i, self._instance), SubRoute(sub_j, self._instance)
+                sub_i, sub_j = (
+                    SubRoute(sub_i, self._instance),
+                    SubRoute(sub_j, self._instance),
+                )
             except ValueError:
                 continue  # Try another pair.
 
             neighbor[i], neighbor[j] = sub_i, sub_j
             yield neighbor
             neighbor[i], neighbor[j] = self[i], self[j]
+
+
+def generate_random_route(instance):
+    customers = [c_id for c_id in instance["customers"]]
+    random.shuffle(customers)
+    capacity = instance["capacity"]
+    route = []
+    sub = []
+    while len(customers) > 0:
+        customer = customers.pop()
+        capacity -= instance["customers"][customer]["demand"]
+
+        if capacity < 0:
+            route.append(sub)
+            sub = []
+            capacity = instance["capacity"] - instance["customers"][customer]["demand"]
+
+        sub.append(customer)
+
+    route.append(sub)
+
+    return Route(route, instance)
 
 
 def read_data_file(filename):
