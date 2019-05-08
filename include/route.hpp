@@ -14,6 +14,7 @@ struct Route
 std::ostream& operator<<(std::ostream&, const Route&);
 Route         randomRoute(const ProblemInstance&);
 bool          satisfiesConstraints(const Route&, const ProblemInstance&);
+double        totalLength(const Route&, const ProblemInstance&);
 
 #ifdef ENABLE_DOCTEST_IN_LIBRARY
 #    include "config.hpp"

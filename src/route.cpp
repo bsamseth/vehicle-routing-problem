@@ -65,3 +65,25 @@ bool satisfiesConstraints(const Route& route, const ProblemInstance& instance)
 
     return true;
 }
+
+double totalLength(const Route& route, const ProblemInstance& instance)
+{
+    double length         = 0;
+    auto   next_partition = route.partitions.begin();
+    auto   depot          = instance.truck.depotCoordinates;
+    auto   last_pos       = depot;
+    for (unsigned i = 0; i < route.ids.size(); ++i)
+    {
+        auto pos = instance.customers[route.ids[i]].coordinates;
+        if (next_partition != route.partitions.end() && i == *next_partition)
+        {
+            length += last_pos || depot;
+            last_pos = depot;
+            ++next_partition;
+        }
+
+        length += last_pos || pos;
+        last_pos = pos;
+    }
+    return length + (last_pos || depot);
+}
