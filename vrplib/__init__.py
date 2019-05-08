@@ -1,3 +1,3 @@
 from _vrplib_backend import *
 
-__all__ = ["Coordinates"]
+__all__ = ["Route", "ProblemInstance", "randomRoute", "readDataFile"]
