@@ -2,8 +2,39 @@ import itertools
 import math
 import copy
 import random
+from numba import njit
 
-DEPOT_ID = -1  # No customer id in data files should have id = DEPOT_ID.
+DEPOT_ID = 0  # Assumption: Customer IDs are strictly larger than DEPOT ID.
+
+@njit()
+def index_of_first_customer(route):
+    i = 0
+    while i < len(route) and route[i] == DEPOT_ID:
+        i += 1
+    return i
+
+def decode(route):
+    first = index_of_first_customer(route)
+    decoded = []
+    sub = []
+    for i, c in enumerate(route[first:]):
+        if c > DEPOT_ID:
+            sub.append(c)
+        elif sub:
+            decoded.append(sub)
+            sub = []
+    if sub:
+        decoded.append(sub)
+    return decoded
+
+@njit()
+def calculate_cost(route, instance):
+    assert len(np.shape(route)) == 1, "Route must be encoded as 1D sequence."
+
+    cost = 0
+
+
+
 
 
 class SubRoute(list):
