@@ -38,6 +38,7 @@ find_lto(CXX)
 #                         Locate files (change as needed).
 # --------------------------------------------------------------------------------
 set(SOURCES          # All .cpp files in src/
+    src/generator.cpp
     src/nearestneighbors.cpp
     src/probleminstance.cpp
     src/route.cpp
