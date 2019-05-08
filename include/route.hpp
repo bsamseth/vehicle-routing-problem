@@ -12,6 +12,7 @@ struct Route
 };
 
 std::ostream& operator<<(std::ostream&, const Route&);
+std::ostream& exportPlotData(std::ostream&, const Route&, const ProblemInstance&);
 Route         randomRoute(const ProblemInstance&);
 bool          satisfiesConstraints(const Route&, const ProblemInstance&);
 double        totalLength(const Route&, const ProblemInstance&);

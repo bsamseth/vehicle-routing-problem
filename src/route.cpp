@@ -87,3 +87,24 @@ double totalLength(const Route& route, const ProblemInstance& instance)
     }
     return length + (last_pos || depot);
 }
+
+std::ostream& exportPlotData(std::ostream&          stm,
+                             const Route&           route,
+                             const ProblemInstance& instance)
+{
+    auto next_partition = route.partitions.begin();
+    auto depot          = instance.truck.depotCoordinates;
+    stm << "[\n\t[ " << depot << ", ";
+    for (unsigned i = 0; i < route.ids.size(); ++i)
+    {
+        if (next_partition != route.partitions.end() && i == *next_partition)
+        {
+            stm << depot << ", ],\n\t[ " << depot << ", ";
+            ++next_partition;
+        }
+        auto pos = instance.customers[route.ids[i]].coordinates;
+        stm << pos << ", ";
+    }
+    stm << depot << ",]\n]";
+    return stm;
+}

@@ -6,11 +6,20 @@
 #    include "doctest.h"
 #endif
 
+#include "config.hpp"
+#include "nearestneighbors.hpp"
+#include "route.hpp"
+
 #include <iostream>
-#include <stdlib.h>
 
 /*
  * Simple main program that demontrates how access
  * CMake definitions (here the version number) from source code.
  */
-int main() {}
+int main()
+{
+    auto  instance = readDataFile(DATA_FOLDER "/size50.txt");
+    Route route    = Optimize::nearestNeighbors(instance);
+    exportPlotData(std::cout, route, instance);
+    std::cout << std::endl;
+}
