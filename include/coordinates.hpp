@@ -1,4 +1,5 @@
 #pragma once
+#include <iostream>
 
 struct Coordinates
 {
@@ -9,6 +10,11 @@ struct Coordinates
 constexpr double operator||(const Coordinates& a, const Coordinates& b)
 {
     return (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y);
+}
+
+inline std::ostream& operator<<(std::ostream& stm, const Coordinates& c)
+{
+    return stm << "(" << c.x << ", " << c.y << ")";
 }
 
 #ifdef ENABLE_DOCTEST_IN_LIBRARY
