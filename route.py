@@ -2,133 +2,119 @@ import itertools
 import math
 import copy
 import random
-from numba import njit
+from itertools import chain
 
 DEPOT_ID = 0  # Assumption: Customer IDs are strictly larger than DEPOT ID.
 
-@njit()
-def index_of_first_customer(route):
-    i = 0
-    while i < len(route) and route[i] == DEPOT_ID:
-        i += 1
-    return i
 
-def decode(route):
-    first = index_of_first_customer(route)
-    decoded = []
-    sub = []
-    for i, c in enumerate(route[first:]):
-        if c > DEPOT_ID:
-            sub.append(c)
-        elif sub:
-            decoded.append(sub)
-            sub = []
-    if sub:
-        decoded.append(sub)
-    return decoded
+def pairwise(iterable):
+    "x -> (x0,x1), (x1,x2), (x2, x3), ..."
+    a, b = tee(iterable)
+    return zip(a, islice(b, 1, None))
 
-@njit()
-def calculate_cost(route, instance):
-    assert len(np.shape(route)) == 1, "Route must be encoded as 1D sequence."
 
+def distance(route, instance):
+    """Return total distance of route."""
     cost = 0
-
-
-
-
-
-class SubRoute(list):
-    def __init__(self, sub_route, instance):
-        super().__init__(sub_route)
-
-        # Compute cost of route and leftover capacity.
-        self.cost = 0
-        self.capacity = instance["capacity"]  # Initial capacity.
-        last_x, last_y = instance["depot"]  # Start at depot.
-        for customer in (instance["customers"][c_id] for c_id in self):
-
-            # Subtract of the demand for this customer, and compute travel cost.
-            self.capacity -= customer["demand"]
-            x, y = customer["coords"]
-            self.cost += math.sqrt((x - last_x) ** 2 + (y - last_y) ** 2)
+    capacity = instance["capacity"]  # Initial capacity.
+    last_x, last_y = instance["depot"]  # Start at depot.
+    for c_id in route:
+        customer = instance["customers"][c_id]
+        if capacity < customer["demand"]:
+            x, y = instance["depot"]
+            cost += (x - last_x) ** 2 + (y - last_y) ** 2
             last_x, last_y = x, y
+            capacity = instance["capacity"]
 
-        # Adding cost of returning home to depot.
-        x, y = instance["depot"]
-        self.cost += math.sqrt((x - last_x) ** 2 + (y - last_y) ** 2)
+        # Subtract of the demand for this customer, and compute travel cost.
+        capacity -= customer["demand"]
+        x, y = customer["coords"]
+        cost += (x - last_x) ** 2 + (y - last_y) ** 2
+        last_x, last_y = x, y
 
-        if self.capacity < 0:
-            raise ValueError(f"The sub route exceeds the capacity of the trucks. {sub_route}")
+    # Adding cost of returning home to depot.
+    x, y = instance["depot"]
+    cost += (x - last_x) ** 2 + (y - last_y) ** 2
+    return cost
 
 
-class Route(list):
-    def __init__(self, route, instance):
-        super().__init__([SubRoute(sub, instance) for sub in route])
-        self._instance = instance
+def reversed_sections(route):
+    """
+    Return all vaiations of route based on reversed sections, in random order.
+    For every possible customer pair, reverse the section between them.
+    Example: reversed_sections([1, 2, 3]) -> [1, 3, 2]
+                                             [3, 1, 2]
+                                             [3, 2, 1]
+                                             [2, 1, 3]
+                                             [2, 3, 1]
+    Lightly adapted from here:
+    http://www.psychicorigami.com/2007/05/12/tackling-the-travelling-salesman-problem-hill-climbing/
+    """
+    r1 = list(range(len(route)))
+    r2 = list(range(len(route)))
+    random.shuffle(r1)
+    random.shuffle(r2)
 
-    @property
-    def cost(self):
-        return sum(sub.cost for sub in self)
+    for i in r1:
+        for j in r2:
+            if i != j:
+                copy = route[:]
+                if i < j:
+                    copy[i : j + 1] = reversed(route[i : j + 1])
+                else:
+                    copy[i + 1 :] = reversed(route[:j])
+                    copy[:j] = reversed(route[i + 1 :])
+                if copy != route:
+                    yield copy
 
-    def neighbors(self):
-        """
-        Yield successive neighbors of this route.
 
-        A neighbor is currently defined simply as a interchange of customers
-        between any pair of sub routes, including within the same sub route.
-        Note that this will yield neighbors forever, and might return the same
-        one more than once.
-        """
-        neighbor = copy.deepcopy(self)
+def random_route(instance):
+    """Return a random route."""
+    route = list(instance["customers"])
+    random.shuffle(route)
+    return route
+
+
+def select_parents(pop, distances, group_size=5):
+    """Return the two best routes out of a random group."""
+    return [
+        pop[distances.index(d)]
+        for d in sorted(
+            map(lambda i: distances[i], np.random.randint(len(pop), size=group_size))
+        )[:2]
+    ]
+
+
+def pmx(p1, p2):
+    """Perform Partially Mapped Crossover on p1 and p2."""
+    return pmx_1(p1, p2), pmx_1(p2, p1)
+
+
+def pmx_1(p1, p2):
+    """Perform Partially Mapped Crossover on p1 and p2, yielding one child."""
+    cut1 = random.randint(0, len(p1) - 2)
+    cut2 = random.randint(cut1, len(p1) - 1)
+
+    c1 = [None] * len(p1)
+    c1[cut1:cut2] = p1[cut1:cut2]
+
+    # fill in parts of p2[cut1:cut2] not in child c1
+    for i in [i for i in p2[cut1:cut2] if i not in c1]:
+        k = p2.index(p1[p2.index(i)])
         while True:
-            i, j = [
-                random.randrange(0, len(self)) for _ in range(2)
-            ]  # Random sub routes i and j.
-            k, l = (
-                random.randrange(0, len(self[i])),
-                random.randrange(0, len(self[j])),
-            )  # Random pair of customers within each sub route.
+            if c1[k] is None:
+                c1[k] = i
+                break
+            else:
+                k = p2.index(p1[k])
 
-            # Swap the two:
-            sub_i, sub_j = list(self[i]), list(self[j])
-            tmp = sub_i[k]
-            sub_i[k] = sub_j[l]
-            sub_j[l] = tmp
+    # Fill in remaining from p2
+    for i in range(len(p2)):
+        if c1[i] is None:
+            c1[i] = p2[i]
 
-            try:
-                # Convert plain lists to SubRoute, which raises error if routes are impossible.
-                sub_i, sub_j = (
-                    SubRoute(sub_i, self._instance),
-                    SubRoute(sub_j, self._instance),
-                )
-            except ValueError:
-                continue  # Try another pair.
-
-            neighbor[i], neighbor[j] = sub_i, sub_j
-            yield neighbor
-            neighbor[i], neighbor[j] = self[i], self[j]
-
-
-def generate_random_route(instance):
-    customers = [c_id for c_id in instance["customers"]]
-    random.shuffle(customers)
-    capacity = instance["capacity"]
-    route = []
-    sub = []
-    while len(customers) > 0:
-        customer = customers.pop()
-        capacity -= instance["customers"][customer]["demand"]
-
-        if capacity < 0:
-            route.append(sub)
-            sub = []
-            capacity = instance["capacity"] - instance["customers"][customer]["demand"]
-
-        sub.append(customer)
-
-    route.append(sub)
-
-    return Route(route, instance)
+    assert len(set(c1)) == len(p1), "Crossover lost something."
+    return c1
 
 
 def read_data_file(filename):
@@ -173,26 +159,3 @@ def read_data_file(filename):
     assert instance["n_nodes"] == len(instance["customers"])
 
     return instance
-
-
-if __name__ == "__main__":
-    instance = read_data_file("data/size50.txt")
-
-    route = Route(
-        [
-            [14, 25, 13, 41, 40, 19, 42, 17],
-            [27, 48, 8, 26, 7, 43, 24, 23, 6],
-            [38, 9, 30, 34, 50, 21, 29, 16, 11, 32],
-            [2, 20, 35, 36, 3, 28, 31, 22, 1],
-            [5, 49, 10, 39, 33, 45, 15, 44, 37, 12],
-            [46, 47, 4, 18],
-        ],
-        instance,
-    )
-
-    print("Initial route:", route)
-    print("Initial cost:", route.cost)
-    print(
-        "Minimum of 1000 neighbors:",
-        min([n.cost for _, n in zip(range(1000), route.neighbors())]),
-    )

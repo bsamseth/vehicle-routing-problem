@@ -2,7 +2,7 @@ import random
 from route import Route, read_data_file, generate_random_route
 
 
-def hill_climb(route, steps=100000):
+def hill_climb(route, steps=100_000):
     """
     Return an optimized solution to the Vehicle Routing Problem using Hill Climbing.
 
@@ -22,7 +22,7 @@ def hill_climb(route, steps=100000):
                 route = neighbor
                 break
         else:  # No break, local optimum:
-            print('Reached local optimum')
+            print("Reached local optimum")
             break
 
     return route
