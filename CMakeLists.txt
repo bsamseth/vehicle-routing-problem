@@ -1,6 +1,6 @@
 # This file specifies how the project should be built, using CMake.
 # If you are unfamiliar with CMake, don't worry about all the details.
-# The sections you might want to edit are marked as such, and 
+# The sections you might want to edit are marked as such, and
 # the comments should hopefully make most of it clear.
 #
 # For many purposes, you may not need to change anything about this file.
@@ -8,8 +8,8 @@
 cmake_minimum_required(VERSION 3.8.2)
 
 # Set project name, version and laguages here. (change as needed)
-# Version numbers are available by including "exampleConfig.h" in 
-# the source. See exampleConfig.h.in for some more details.
+# Version numbers are available by including "exampleConfig.h" in
+# the source. See config.hpp.in for some more details.
 project(VehicleRoutingProblem VERSION 0.0.0.1 LANGUAGES CXX)
 
 
@@ -71,10 +71,10 @@ target_enable_lto(main optimized)  # enable link-time-optimization if available 
 
 # Set the properties you require, e.g. what C++ standard to use. Here applied to library and main (change as needed).
 set_target_properties(
-    ${LIBRARY_NAME} main 
-      PROPERTIES 
-        CXX_STANDARD 17 
-        CXX_STANDARD_REQUIRED YES 
+    ${LIBRARY_NAME} main
+      PROPERTIES
+        CXX_STANDARD 17
+        CXX_STANDARD_REQUIRED YES
         CXX_EXTENSIONS NO
 )
 
