@@ -5,7 +5,7 @@
 # correct definitions. Here only used to make version number available to
 # the source code. Include "exampleConfig.h" (no .in suffix) in the source.
 configure_file (
-  "${PROJECT_SOURCE_DIR}/include/config.hpp.in"
+  "${PROJECT_SOURCE_DIR}/vrplib/config.hpp.in"
   "${PROJECT_BINARY_DIR}/config.hpp"
 )
 # add the binary tree to the search path for include files

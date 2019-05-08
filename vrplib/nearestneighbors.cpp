@@ -1,6 +1,7 @@
 #include "nearestneighbors.hpp"
 
 #include <limits>
+#include <numeric>
 
 namespace Optimize
 {
