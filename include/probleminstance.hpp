@@ -17,11 +17,12 @@ struct ProblemInstance
 ProblemInstance readDataFile(std::string filename);
 
 #ifdef ENABLE_DOCTEST_IN_LIBRARY
+#    include "config.hpp"
 #    include "doctest.h"
 
 TEST_CASE("Read input file")
 {
-    ProblemInstance instance = readDataFile("../data/size50.txt");
+    auto instance = readDataFile(DATA_FOLDER "/size50.txt");
 
     CHECK(instance.customers.size() == 50);
 
