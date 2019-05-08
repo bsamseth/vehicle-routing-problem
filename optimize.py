@@ -1,6 +1,8 @@
-from route import Route, read_data_file
+import random
+from route import Route, read_data_file, generate_random_route
 
-def hill_climb(route, steps=10000):
+
+def hill_climb(route, steps=100000):
     """
     Return an optimized solution to the Vehicle Routing Problem using Hill Climbing.
 
@@ -19,11 +21,15 @@ def hill_climb(route, steps=10000):
             if neighbor.cost < route.cost:
                 route = neighbor
                 break
+        else:  # No break, local optimum:
+            print('Reached local optimum')
+            break
 
     return route
 
 
 if __name__ == "__main__":
+    random.seed(2019)
     instance = read_data_file("data/size50.txt")
 
     # Some starting point that is "legal", i.e. satisfies constraints.
@@ -39,10 +45,10 @@ if __name__ == "__main__":
         instance,
     )
 
+    route = generate_random_route(instance)
     print(f"Initial route: {route}")
     print(f"Initial cost: {route.cost}")
     print("Climbing the hill...")
-
     route = hill_climb(route, 10000)
 
     print(f"Final route: {route}")
