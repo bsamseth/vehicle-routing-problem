@@ -1,13 +1,14 @@
 #pragma once
 
+#include "coordinates.hpp"
+
 using CustomerId = unsigned;
 
 struct Customer
 {
-    int        x;
-    int        y;
-    unsigned   demand;
-    CustomerId id;
+    Coordinates coordinates;
+    unsigned    demand;
+    CustomerId  id;
 };
 
 #ifdef ENABLE_DOCTEST_IN_LIBRARY

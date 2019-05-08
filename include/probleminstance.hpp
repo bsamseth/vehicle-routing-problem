@@ -26,13 +26,13 @@ TEST_CASE("Read input file")
     CHECK(instance.customers.size() == 50);
 
     CHECK(instance.customers[0].id == 1);
-    CHECK(instance.customers[0].x == 37);
-    CHECK(instance.customers[0].y == 52);
+    CHECK(instance.customers[0].coordinates.x == 37);
+    CHECK(instance.customers[0].coordinates.y == 52);
     CHECK(instance.customers[0].demand == 7);
 
     CHECK(instance.truck.capacity == 160);
-    CHECK(instance.truck.depotX == 30);
-    CHECK(instance.truck.depotY == 40);
+    CHECK(instance.truck.depotCoordinates.x == 30);
+    CHECK(instance.truck.depotCoordinates.y == 40);
 }
 
 #endif

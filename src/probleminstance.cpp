@@ -12,13 +12,13 @@ ProblemInstance readDataFile(std::string filename)
     ProblemInstance instance;
     int             nodes;
 
-    data >> nodes >> instance.truck.capacity >> instance.truck.depotX
-        >> instance.truck.depotY;
+    data >> nodes >> instance.truck.capacity >> instance.truck.depotCoordinates.x
+        >> instance.truck.depotCoordinates.y;
 
     for (int i = 0; i < nodes; ++i)
     {
         Customer c;
-        data >> c.id >> c.x >> c.y >> c.demand;
+        data >> c.id >> c.coordinates.x >> c.coordinates.y >> c.demand;
         instance.customers.push_back(c);
     }
 

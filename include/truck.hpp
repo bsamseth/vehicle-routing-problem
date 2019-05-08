@@ -1,11 +1,12 @@
 #pragma once
 
+#include "coordinates.hpp"
+
 struct Truck
 {
-    int      depotX;
-    int      depotY;
-    unsigned capacity;
-    unsigned id;
+    Coordinates depotCoordinates;
+    unsigned    capacity;
+    unsigned    id;
 };
 
 #ifdef ENABLE_DOCTEST_IN_LIBRARY
