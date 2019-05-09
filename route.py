@@ -1,8 +1,5 @@
-import itertools
-import math
-import copy
 import random
-from itertools import chain
+import numpy as np
 
 DEPOT_ID = 0  # Assumption: Customer IDs are strictly larger than DEPOT ID.
 
