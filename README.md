@@ -14,10 +14,20 @@ The objective to minimize here is the total Euclidean distance driven by all tru
 
 ## Structure
 
-- `route.py` contains the code for the representation of a route
-  + A `Route` object is a Python-list with some extra functionallity.
-  + The elements of the `Route` are `SubRoute`s
-    - A `SubRoute` is a Python-list of customer IDs, indicating the sequence of customers to serve in order. 
-    - It also contains the cost of the sub-route, and the excess capacity on the truck (the amount of product left over when the sub-route would be completed).
-- `optimize.py` contains the code for optimizing routes.
-  - Currently only a simple hill climbing strategy.
+- `route.py`: Lots of utilities
+- `hill_climb.py`/`ea.py`: Code for hill climbing/evolutionary algorithm
+  - Both files can be run, which will produce some statistics/plots.
+- `plot_route.py`: Utility to plot a route
+
+
+## Setup
+
+Requires Python 3.6.
+
+``` bash
+> pip install pipenv  # If not installed before (may need to use pip3 instead)
+> pipenv install
+> pipenv shell
+> python filename_of_file_to_run.py
+```
+
